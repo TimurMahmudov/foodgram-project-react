@@ -14,7 +14,8 @@ User = get_user_model()
 
 class CustomUserViewSet(UserViewSet):
     """Вьюсет пользователей"""
-    queryset = User.objects.all()
+    def get_queryset(self):
+        return User.objects.all()
 
     # Просмотр авторов рецептов, на которых подписан пользователь
     @action(
@@ -25,10 +26,12 @@ class CustomUserViewSet(UserViewSet):
     def subscriptions(self, request):
         user = request.user
         queryset = User.objects.filter(subscribe__subscriber=user)
-        serializer = AuthorOfRecipesSerializer(queryset,
+        set_in_pages = self.paginate_queryset(queryset=queryset)
+        serializer = AuthorOfRecipesSerializer(set_in_pages,
                                                many=True,
                                                context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data,
+                                           status=status.HTTP_200_OK)
 
     # Подписка/отписка от авторов рецептов
     @action(

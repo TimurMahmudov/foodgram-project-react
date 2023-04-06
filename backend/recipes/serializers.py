@@ -10,6 +10,8 @@ from users.serializers import UserReadSerializer
 
 User = get_user_model()
 
+UPDATE = "instance.{} = validated_data.get(field, instance.{})"
+
 
 class Hex2NameColor(serializers.Field):
     """Сериализатор отображения цвета."""
@@ -53,10 +55,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientInRecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для ингредиентов при создании рецепта."""
-    amount = serializers.IntegerField()
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
 
     class Meta:
-        model = Ingredient
+        model = IngredientInRecipe
         fields = ('id', 'amount')
 
 
@@ -70,7 +72,7 @@ class IngredientInRecipeReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IngredientInRecipe
-        fields = '__all__'
+        fields = ('id', 'name', 'amount', 'measurement_unit')
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
@@ -88,16 +90,20 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_favorited(self, obj):
+        if self.context['request'].user.is_anonymous:
+            return False
         return FavoriteRecipe.objects.filter(
             user=self.context['request'].user,
             recipe=obj
-        )
+        ).exists()
 
     def get_shopping(self, obj):
+        if self.context['request'].user.is_anonymous:
+            return False
         return ShoppingCart.objects.filter(
             user=self.context['request'].user,
             recipe=obj
-        )
+        ).exists()
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -112,11 +118,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'text', 'cooking_time',
                   'image', 'tags', 'ingredients')
 
+    def to_representation(self, instance):
+        serializer = RecipeReadSerializer(instance, context=self.context)
+        return serializer.data
+
     def create(self, validated_data):
+        print(self.initial_data)
         tags = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
         new_recipe = Recipe.objects.create(**validated_data)
-        new_recipe.tags.set([tag] for tag in tags)
+        new_recipe.tags.set(tags)
         for ingredient_data in ingredients_data:
             IngredientInRecipe.objects.create(
                 ingredient=ingredient_data['id'],
@@ -137,8 +148,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             field = field.name.split('.')[-1]
             if field in exclude:
                 continue
-            exec("instance.{} = validated_data.get(field, instance.{})".format(field, field))
-        instance.tags.set([tag] for tag in tags)
+            exec(UPDATE.format(field, field))
+        instance.tags.set(tags)
         for ingredient_data in new_ingredients:
             IngredientInRecipe.objects.create(
                 ingredient=ingredient_data['id'],
@@ -157,7 +168,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        recipe = Recipe.objects.get(pk=data['recipe'])
+        recipe = data['recipe']
         user = self.context['request'].user
         if FavoriteRecipe.objects.filter(recipe=recipe, user=user).exists():
             raise serializers.ValidationError(
@@ -174,7 +185,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        recipe = Recipe.objects.get(pk=data['recipe'])
+        recipe = data['recipe']
         user = self.context['request'].user
         if ShoppingCart.objects.filter(recipe=recipe, user=user).exists():
             raise serializers.ValidationError(

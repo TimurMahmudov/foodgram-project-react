@@ -47,11 +47,18 @@ class Recipe(models.Model):
                                null=True,
                                verbose_name='Автор',
                                related_name='recipes')
-    name = models.CharField(max_length=100, db_index=True)
-    image = models.ImageField(upload_to='фото_рецептов')
-    text = models.TextField()
-    cooking_time = models.PositiveIntegerField()
-    tags = models.ManyToManyField(Tag)
+    name = models.CharField(max_length=100,
+                            db_index=True,
+                            verbose_name='Название рецепта')
+    image = models.ImageField(upload_to='фото_рецептов',
+                              verbose_name='Фото рецепта')
+    text = models.TextField(verbose_name='Описание приготовления рецепта')
+    cooking_time = models.PositiveIntegerField(
+        verbose_name='Время приготовления'
+    )
+    tags = models.ManyToManyField(Tag,
+                                  related_name='recipes',
+                                  verbose_name='Теги')
     ingredients = models.ManyToManyField(Ingredient,
                                          through='IngredientInRecipe')
 

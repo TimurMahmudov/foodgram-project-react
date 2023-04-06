@@ -1,36 +1,19 @@
-"""
-URL configuration for foodgram project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.routers import DefaultRouter
 
-from foodgram import settings
-from users.views import CustomUserViewSet
-from recipes.views import IngredientViewSet, RecipeViewSet, TagViewSet
+from foodgram.router import NewDefaultRouter
+from users.urls import users_router
+from recipes.urls import recipe_router
 
-router_v1 = DefaultRouter()
-router_v1.register(r'users', CustomUserViewSet, basename='users')
-router_v1.register(r'recipes', RecipeViewSet, basename='recipes')
-router_v1.register(r'tags', TagViewSet)
-router_v1.register(r'ingredients', IngredientViewSet)
+router_v1 = NewDefaultRouter()
+router_v1.extend(users_router)
+router_v1.extend(recipe_router)
 
 backends_urls = [
     path('', include(router_v1.urls)),
+    path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]
 
@@ -40,5 +23,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)

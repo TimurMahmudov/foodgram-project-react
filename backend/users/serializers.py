@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, hashers
 from rest_framework import serializers
 
 from .models import Subscription
@@ -7,6 +7,7 @@ from recipes.models import Recipe
 User = get_user_model()
 
 INVALID_USERNAMES = ['me', 'admin', 'user', 'username']
+VALID_TEXT = 'Логин не может быть одним из: {}, {}, {}, {}'
 
 
 class UserAfterRegisterSerializer(serializers.ModelSerializer):
@@ -19,6 +20,8 @@ class UserAfterRegisterSerializer(serializers.ModelSerializer):
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     """Регистрация пользователя"""
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
 
     class Meta:
         model = User
@@ -35,9 +38,20 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             )
         if data['username'] in INVALID_USERNAMES:
             raise serializers.ValidationError(
-                'Логин не может быть одним из: {}, {}, {}, {}'.format(*INVALID_USERNAMES)
+                VALID_TEXT.format(*INVALID_USERNAMES)
+            )
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                'Введённый Email уже занят!'
             )
         return data
+
+    def create(self, validated_data):
+        data = validated_data
+        data['password'] = hashers.make_password(data.get('password'))
+        user = User.objects.create(**data)
+        user.save()
+        return user
 
 
 class UserReadSerializer(serializers.ModelSerializer):
@@ -46,9 +60,12 @@ class UserReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'first_name', 'last_name', 'username', 'is_subscribed')
+        fields = ('email', 'id', 'first_name',
+                  'last_name', 'username', 'is_subscribed')
 
     def get_subscribed(self, obj):
+        if self.context['request'].user.is_anonymous:
+            return False
         return Subscription.objects.filter(
             subscriber=self.context['request'].user,
             author=obj
@@ -90,7 +107,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя!'
             )
-        if Subscription.objects.filter(subscriber=user, author=author).exists():
+        if Subscription.objects.filter(subscriber=user,
+                                       author=author).exists():
             raise serializers.ValidationError(
                 'Вы уже подписаны на данного автора!'
             )
