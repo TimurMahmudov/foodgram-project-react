@@ -26,7 +26,7 @@ class AlphabetListFilter(admin.SimpleListFilter):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id', 'slug']
+    list_display = ['name', 'id', 'slug', 'color']
     list_filter = ('slug', )
 
 
