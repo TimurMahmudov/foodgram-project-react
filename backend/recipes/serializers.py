@@ -10,7 +10,7 @@ from users.serializers import UserReadSerializer
 
 User = get_user_model()
 
-UPDATE = "instance.{} = validated_data.get(field, instance.{})"
+EXEC_UPDATE = "instance.{} = validated_data.get(field, instance.{})"
 
 
 class Hex2NameColor(serializers.Field):
@@ -148,7 +148,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             field = field.name.split('.')[-1]
             if field in exclude:
                 continue
-            exec(UPDATE.format(field, field))
+            exec(EXEC_UPDATE.format(field, field))
         instance.tags.set(tags)
         for ingredient_data in new_ingredients:
             IngredientInRecipe.objects.create(
