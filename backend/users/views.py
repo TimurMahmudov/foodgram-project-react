@@ -1,5 +1,5 @@
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import permissions, status
 from rest_framework.decorators import action
@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from .models import Subscription
 from .serializers import AuthorOfRecipesSerializer, SubscriptionSerializer
-
 
 User = get_user_model()
 

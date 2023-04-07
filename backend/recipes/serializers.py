@@ -1,12 +1,13 @@
 import base64
+
 import webcolors
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-
-from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
-                     Recipe, ShoppingCart, Tag)
 from users.serializers import UserReadSerializer
+
+from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe, Recipe,
+                     ShoppingCart, Tag)
 
 User = get_user_model()
 

@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Exists, OuterRef
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from users.serializers import RecipeFromTheAuthor
 
 from .filters import RecipeFilter
-from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
-                     Recipe, ShoppingCart, Tag)
+from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe, Recipe,
+                     ShoppingCart, Tag)
 from .permissions import AccessUpdateAndDelete
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
