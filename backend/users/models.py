@@ -5,15 +5,17 @@ User = get_user_model()
 
 
 class Subscription(models.Model):
-    """Подписки"""
-    subscriber = models.ForeignKey(User,
-                                   on_delete=models.CASCADE,
-                                   verbose_name='Подписчик',
-                                   related_name='subscriber')
+    """
+    Подписки
+    """
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
                                verbose_name='Автор',
-                               related_name='subscrib')
+                               related_name='subscribe')
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name='Подписчик',
+                             related_name='subscriber')
 
     class Meta:
         ordering = ('author', )
@@ -21,10 +23,10 @@ class Subscription(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
-                fields=['subscriber', 'author'],
+                fields=['user', 'author'],
                 name='unique_following'
             )
         ]
 
     def __str__(self):
-        return f'{self.subscriber} подписан на {self.author}'
+        return f'{self.user} подписан на {self.author}'

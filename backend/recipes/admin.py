@@ -5,6 +5,9 @@ from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe, Recipe,
 
 
 class AlphabetListFilter(admin.SimpleListFilter):
+    """
+    Фильтра по алфавиту
+    """
     alphabet = 'абвгдежзийклмнопрстуфхцчшщэюя'
     title = ('По алфавиту')
     parameter_name = 'alphabet'
@@ -25,17 +28,26 @@ class AlphabetListFilter(admin.SimpleListFilter):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    """
+    Модель Tag
+    """
     list_display = ['name', 'id', 'slug', 'color']
     list_filter = ('slug', )
 
 
 class TagInline(admin.TabularInline):
+    """
+    Inline поле на странице редактирования Рецепта
+    """
     model = Tag.recipes.through
     extra = 1
 
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    """
+    Модель Рецепта
+    """
     list_display = ['name', 'author', 'is_favorited']
     list_filter = ('name', 'author', 'tags')
     exclude = ('tags', )
@@ -51,21 +63,33 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
+    """
+    Модель Ингредиентов
+    """
     list_display = ['name', 'measurement_unit']
     list_filter = [AlphabetListFilter, ]
 
 
 @admin.register(IngredientInRecipe)
 class IngredientInRecipesAdmin(admin.ModelAdmin):
+    """
+    Связь Ингредиент - Рецепт
+    """
     list_display = ['recipe', 'ingredient', 'amount']
     fields = ('recipe', ('ingredient', 'amount'))
 
 
 @admin.register(FavoriteRecipe)
 class FavoriteAdmin(admin.ModelAdmin):
+    """
+    Избранное
+    """
     list_display = ['recipe', 'user']
 
 
 @admin.register(ShoppingCart)
 class ShoppingAdmin(admin.ModelAdmin):
+    """
+    Список покупок
+    """
     list_display = ['recipe', 'user']

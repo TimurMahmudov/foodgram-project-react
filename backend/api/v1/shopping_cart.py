@@ -1,9 +1,12 @@
 from typing import List
 
-from .models import IngredientInRecipe
+from recipes.models import IngredientInRecipe
 
 
 def create_shopping_cart(lst: List[IngredientInRecipe]) -> str:
+    """
+    Создание списка покупок
+    """
     dct = {}
     for comp in lst:
         if comp.ingredient not in dct:

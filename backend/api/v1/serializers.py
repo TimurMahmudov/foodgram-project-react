@@ -4,10 +4,10 @@ import webcolors
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-from users.serializers import UserReadSerializer
 
-from .models import (FavoriteRecipe, Ingredient, IngredientInRecipe, Recipe,
-                     ShoppingCart, Tag)
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
+                            Recipe, ShoppingCart, Tag)
+from .users_serializers import UserReadSerializer
 
 User = get_user_model()
 
@@ -119,22 +119,26 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('name', 'text', 'cooking_time',
                   'image', 'tags', 'ingredients')
 
+    def _create_ingredients_in_recipe(self, recipe, ingredients_data):
+        return IngredientInRecipe.objects.bulk_create(
+            IngredientInRecipe(
+                ingredient=component['id'],
+                recipe=recipe,
+                amount=component['amount']
+            ) for component in ingredients_data
+        )
+
     def to_representation(self, instance):
         serializer = RecipeReadSerializer(instance, context=self.context)
         return serializer.data
 
     def create(self, validated_data):
-        print(self.initial_data)
         tags = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
         new_recipe = Recipe.objects.create(**validated_data)
         new_recipe.tags.set(tags)
-        for ingredient_data in ingredients_data:
-            IngredientInRecipe.objects.create(
-                ingredient=ingredient_data['id'],
-                recipe=new_recipe,
-                amount=ingredient_data['amount']
-            )
+        self._create_ingredients_in_recipe(recipe=new_recipe,
+                                           ingredients_data=ingredients_data)
         new_recipe.save()
         return new_recipe
 
@@ -143,20 +147,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients.delete()
         new_ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        fields = instance._meta.fields
-        exclude = []
-        for field in fields:
-            field = field.name.split('.')[-1]
-            if field in exclude:
-                continue
-            exec(EXEC_UPDATE.format(field, field))
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
+        instance.image = validated_data.get('image', instance.image)
         instance.tags.set(tags)
-        for ingredient_data in new_ingredients:
-            IngredientInRecipe.objects.create(
-                ingredient=ingredient_data['id'],
-                amount=ingredient_data['amount'],
-                recipe=instance
-            )
+        self._create_ingredients_in_recipe(recipe=instance,
+                                           ingredients_data=new_ingredients)
         instance.save()
         return instance
 

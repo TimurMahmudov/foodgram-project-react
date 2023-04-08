@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model, hashers
-from recipes.models import Recipe
 from rest_framework import serializers
 
-from .models import Subscription
+from recipes.models import Recipe
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -11,7 +11,9 @@ VALID_TEXT = 'Логин не может быть одним из: {}, {}, {}, {
 
 
 class UserAfterRegisterSerializer(serializers.ModelSerializer):
-    """Отображение после регистрации"""
+    """
+    Отображение после регистрации
+    """
 
     class Meta:
         model = User
@@ -19,7 +21,9 @@ class UserAfterRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    """Регистрация пользователя"""
+    """
+    Регистрация пользователя
+    """
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
 
@@ -55,7 +59,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserReadSerializer(serializers.ModelSerializer):
-    """Просмотр пользователя"""
+    """
+    Просмотр пользователя
+    """
     is_subscribed = serializers.SerializerMethodField('get_subscribed')
 
     class Meta:
@@ -67,13 +73,15 @@ class UserReadSerializer(serializers.ModelSerializer):
         if self.context['request'].user.is_anonymous:
             return False
         return Subscription.objects.filter(
-            subscriber=self.context['request'].user,
+            user=self.context['request'].user,
             author=obj
         ).exists()
 
 
 class RecipeFromTheAuthor(serializers.ModelSerializer):
-    """Список рецептов от данного автора"""
+    """
+    Список рецептов от данного автора
+    """
 
     class Meta:
         model = Recipe
@@ -81,33 +89,37 @@ class RecipeFromTheAuthor(serializers.ModelSerializer):
 
 
 class AuthorOfRecipesSerializer(UserReadSerializer):
-    """Авторы, на которых подписан пользователь"""
-    recipes = RecipeFromTheAuthor(many=True, source='recipes')
+    """
+    Авторы, на которых подписан пользователь
+    """
+    recipes = RecipeFromTheAuthor(many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('email', 'id', 'first_name', 'last_name',
-                  'username', 'is_subscibed', 'recipes', 'recipes_count')
+                  'username', 'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    """Сериализатор создания подписки"""
+    """
+    Сериализатор создания подписки
+    """
 
     class Meta:
         model = Subscription
-        fields = ('subscriber', 'author')
+        fields = ('user', 'author')
 
     def validate(self, data):
-        user, author = data['subscriber'], data['author']
+        user, author = data['user'], data['author']
         if user == author:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя!'
             )
-        if Subscription.objects.filter(subscriber=user,
+        if Subscription.objects.filter(user=user,
                                        author=author).exists():
             raise serializers.ValidationError(
                 'Вы уже подписаны на данного автора!'

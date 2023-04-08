@@ -6,7 +6,9 @@ User = get_user_model()
 
 
 class Tag(models.Model):
-    """Теги"""
+    """
+    Теги
+    """
     name = models.CharField(max_length=50,
                             unique=True,
                             verbose_name='Введите название тега')
@@ -23,7 +25,9 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Ингредиенты"""
+    """
+    Ингредиенты
+    """
     name = models.CharField(max_length=100,
                             db_index=True,
                             verbose_name='Название ингредиента')
@@ -40,7 +44,9 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    """Рецепты"""
+    """
+    Рецепты
+    """
     author = models.ForeignKey(User,
                                on_delete=models.SET_NULL,
                                null=True,
@@ -52,7 +58,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='фото_рецептов',
                               verbose_name='Фото рецепта')
     text = models.TextField(verbose_name='Описание приготовления рецепта')
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготовления'
     )
     tags = models.ManyToManyField(Tag,
@@ -71,7 +77,9 @@ class Recipe(models.Model):
 
 
 class IngredientInRecipe(models.Model):
-    """Связь между рецептами и ингредиентами"""
+    """
+    Связь между рецептами и ингредиентами
+    """
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
                                related_name='recipe_ingredient',
@@ -98,7 +106,9 @@ class IngredientInRecipe(models.Model):
 
 
 class FavoriteRecipe(models.Model):
-    """Избранное"""
+    """
+    Избранное
+    """
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
                                related_name='favorites',
@@ -124,7 +134,9 @@ class FavoriteRecipe(models.Model):
 
 
 class ShoppingCart(models.Model):
-    """Список покупок"""
+    """
+    Список покупок
+    """
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
                                related_name='shopping_cart',
