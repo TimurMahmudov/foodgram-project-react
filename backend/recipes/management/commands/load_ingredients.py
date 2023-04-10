@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         with open(
-            '../data/ingredients.json',
+            './data/ingredients.json',
             'r',
             encoding='utf-8'
         ) as file:
