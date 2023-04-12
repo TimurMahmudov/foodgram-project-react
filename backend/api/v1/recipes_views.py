@@ -2,11 +2,11 @@ from django.contrib.auth import get_user_model
 from django.db.models import Exists, OuterRef
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
+                            Recipe, ShoppingCart, Tag)
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 
-from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
-                            Recipe, ShoppingCart, Tag)
 from .filters import RecipeFilter
 from .mixins import CreateDestroyObjView
 from .permissions import AccessUpdateAndDelete

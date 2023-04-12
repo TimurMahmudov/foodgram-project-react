@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework import permissions
 from rest_framework.decorators import action
-
 from users.models import Subscription
+
 from .mixins import CreateDestroyObjView
 from .users_serializers import (AuthorOfRecipesSerializer,
                                 SubscriptionSerializer)
