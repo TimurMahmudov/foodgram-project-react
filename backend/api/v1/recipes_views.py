@@ -75,6 +75,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     )
                 )
             )
+            return queryset
         return queryset
 
     def perform_create(self, serializer):
