@@ -7,7 +7,7 @@ services:
     env_file:
       - ./.env
   backend:
-    image: exormalik/foodgram_backend
+    image: exormalik/backend:v1
     restart: always
     volumes:
       - static_value:/app/static/
@@ -17,7 +17,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: exormalik/foodgram_frontend
+    image: exormalik/frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
   nginx:
