@@ -11,9 +11,7 @@ SECRET_KEY = 'django-insecure-g+-3alp_5cbz15_o0m#7^aqa4xv(6#=^=9@p(7q^c#$^99g7f-
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['158.160.57.173']
-
-CSRF_TRUSTED_ORIGINS = ['http://158.160.57.173']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
