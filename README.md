@@ -158,3 +158,11 @@
 
 ### Автор:
 [Тимур](https://github.com/TimurMahmudov)
+
+
+Администратор:
+
+```
+Логин: foodgram_exormalik
+Пароль: tGotFM18103
+```
