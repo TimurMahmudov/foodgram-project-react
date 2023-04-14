@@ -9,11 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-g+-3alp_5cbz15_o0m#7^aqa4xv(6#=^=9@p(7q^c#$^99g7f-'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['158.160.57.173']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'https://158.160.57.173']
+CSRF_TRUSTED_ORIGINS = ['http://158.160.57.173']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,9 +22,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',
     'djoser',
     'corsheaders',
     'colorfield',
@@ -46,6 +46,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'foodgram.urls'
 
+CORS_URLS_REGEX = r'^/api/.*$'
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -63,6 +69,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
+
 
 DATABASES = {
     'default': {
@@ -121,12 +128,6 @@ DJOSER = {
         'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     },
 }
-
-CORS_URLS_REGEX = r'^/api/.*$'
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
 
 LANGUAGE_CODE = 'ru'
 

@@ -16,7 +16,7 @@ class CustomUserViewSet(UserViewSet):
     Вьюсет пользователей
     """
     def get_queryset(self):
-        return User.objects.all()
+        return User.objects.order_by('username')
 
     """
     Просмотр авторов рецептов, на которых подписан пользователь
@@ -28,7 +28,9 @@ class CustomUserViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         user = request.user
-        queryset = User.objects.filter(subscribe__user=user)
+        queryset = User.objects.filter(
+            subscribe__user=user
+        ).order_by('username')
         set_in_pages = self.paginate_queryset(queryset=queryset)
         serializer = AuthorOfRecipesSerializer(set_in_pages,
                                                many=True,

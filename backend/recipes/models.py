@@ -21,7 +21,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - {self.slug}'
 
 
 class Ingredient(models.Model):
@@ -66,9 +66,11 @@ class Recipe(models.Model):
                                   verbose_name='Теги')
     ingredients = models.ManyToManyField(Ingredient,
                                          through='IngredientInRecipe')
+    pub_date = models.DateTimeField(auto_now_add=True,
+                                    verbose_name='Дата публикации')
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('-pub_date', )
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 

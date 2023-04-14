@@ -20,11 +20,10 @@ class AlphabetListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         for letter in self.alphabet:
-            if self.value() != letter:
-                return None
-            return queryset.filter(
-                name__startswith=letter
-            )
+            if self.value() == letter:
+                return queryset.filter(
+                    name__startswith=letter
+                )
 
 
 @admin.register(Tag)
@@ -67,8 +66,9 @@ class IngredientAdmin(admin.ModelAdmin):
     """
     Модель Ингредиентов
     """
-    list_display = ['name', 'measurement_unit']
+    list_display = ['id', 'name', 'measurement_unit']
     list_filter = [AlphabetListFilter, ]
+    search_fields = ('name', 'id')
 
 
 @admin.register(IngredientInRecipe)

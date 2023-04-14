@@ -1,13 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Exists, OuterRef
 from django.http import FileResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import (FavoriteRecipe, Ingredient, IngredientInRecipe,
                             Recipe, ShoppingCart, Tag)
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 
-from .filters import RecipeFilter
+from .filters import IngredientFilter, RecipeFilter
 from .mixins import CreateDestroyObjView
 from .permissions import AccessUpdateAndDelete
 from .recipes_serializers import (FavoriteSerializer, IngredientSerializer,
@@ -24,6 +23,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     Вьюсет тегов. Только чтение
     """
     queryset = Tag.objects.all()
+    pagination_class = None
     serializer_class = TagSerializer
 
 
@@ -33,8 +33,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filterset_class = IngredientFilter
     pagination_class = None
-    filter_backends = (DjangoFilterBackend, )
+    search_fields = ('^name', )
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -42,10 +43,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     Вьюсет рецептов
     """
     serializer_class = RecipeReadSerializer
-    queryset = Recipe.objects.all()
     permission_classes = (AccessUpdateAndDelete, )
-    filter_backends = (DjangoFilterBackend, )
-    filter_class = RecipeFilter
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method not in permissions.SAFE_METHODS:
@@ -111,7 +110,9 @@ class ShoppingCartViewSet(CreateDestroyObjView):
     response_serializer = RecipeFromTheAuthor
 
     def get_queryset(self):
-        return self.request.user.shopping_cart
+        return ShoppingCart.objects.filter(
+            user=self.request.user
+        )
 
     def create(self, request, recipe_id):
         return super().create(request, recipe_id)
@@ -130,7 +131,9 @@ class FavoriteRecipesViewSet(CreateDestroyObjView):
     response_serializer = RecipeFromTheAuthor
 
     def get_queryset(self):
-        return self.request.user.favorites
+        return FavoriteRecipe.objects.filter(
+            user=self.request.user
+        )
 
     def create(self, request, recipe_id):
         return super().create(request, recipe_id)

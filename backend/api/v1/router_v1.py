@@ -5,7 +5,7 @@ from .recipes_views import (FavoriteRecipesViewSet, IngredientViewSet,
 from .users_views import CreateDestroySubscribeViewSet, CustomUserViewSet
 
 router_v1 = DefaultRouter()
-router_v1.register(r'tags', TagViewSet)
+router_v1.register(r'tags', TagViewSet, basename='tags')
 router_v1.register(r'ingredients', IngredientViewSet)
 router_v1.register(r'users',
                    CustomUserViewSet,

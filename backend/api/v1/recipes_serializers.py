@@ -47,7 +47,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -100,7 +100,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ('id', 'author', 'name', 'image', 'tags',
+                  'cooking_time', 'ingredients', 'is_favorited',
+                  'is_in_shopping_cart', 'text')
 
     def get_favorited(self, obj):
         if self.context['request'].user.is_anonymous:
