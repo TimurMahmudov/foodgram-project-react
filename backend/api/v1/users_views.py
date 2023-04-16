@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from users.models import Subscription
 
 from .mixins import CreateDestroyObjView
+from .paginations import CustomPagination
 from .users_serializers import (AuthorOfRecipesSerializer,
                                 SubscriptionSerializer)
 
@@ -15,6 +16,7 @@ class CustomUserViewSet(UserViewSet):
     """
     Вьюсет пользователей
     """
+    pagination_class = CustomPagination
     def get_queryset(self):
         return User.objects.order_by('username')
 

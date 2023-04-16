@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import CreateDestroyObjView
+from .paginations import CustomPagination
 from .permissions import AccessUpdateAndDelete
 from .recipes_serializers import (FavoriteSerializer, IngredientSerializer,
                                   RecipeCreateSerializer, RecipeReadSerializer,
@@ -45,6 +46,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeReadSerializer
     permission_classes = (AccessUpdateAndDelete, )
     filterset_class = RecipeFilter
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.request.method not in permissions.SAFE_METHODS:
