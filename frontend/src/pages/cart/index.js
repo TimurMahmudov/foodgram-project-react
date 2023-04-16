@@ -16,7 +16,7 @@ const Cart = ({ updateOrders, orders }) => {
     api
       .getRecipes({
         page: 1,
-        limit: 999,
+        limit: 6,
         is_in_shopping_cart: Number(true)
       })
       .then(res => {
