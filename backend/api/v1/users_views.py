@@ -17,6 +17,7 @@ class CustomUserViewSet(UserViewSet):
     Вьюсет пользователей
     """
     pagination_class = CustomPagination
+
     def get_queryset(self):
         return User.objects.order_by('username')
 
